@@ -1,0 +1,4 @@
+// MongoDB Playground
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+db.getCollection("server_logs").find({"level":"debug"})

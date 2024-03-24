@@ -2,10 +2,13 @@ const { format, createLogger, transports } = require("winston");
 require("winston-daily-rotate-file");
 require("winston-mongodb");
 
+require("dotenv").config(); //fail to run test - provide db to log
+
 const { combine, timestamp, label, prettyPrint } = format;
-const filerotateTransport = new transports.DailyRotateFile({
+
+const fileRotateTransport = new transports.DailyRotateFile({
   level: "info",
-  filename: "logs/info-%DATE.log",
+  filename: "logs/info-%DATE%.log",
   datePattern: "DD-MM-YYYY",
   maxFiles: "10d",
 });
@@ -15,10 +18,10 @@ const logger = createLogger({
   format: combine(
     label({ label: "Logs for Users Products App" }),
     timestamp({
-      format: "DD-MM-YYY HH:mm:ss",
+      format: "DD-MM-YYYY HH:mm:ss",
     }),
     format.json()
-    //prettyPrint()
+    // prettyPrint()
   ),
   transports: [
     new transports.Console(),
@@ -33,12 +36,17 @@ const logger = createLogger({
       level: "info",
       filename: "logs/info.log",
     }),
-    fileRotatedTransport,
+    fileRotateTransport,
     new transports.MongoDB({
-      //   level: "info",
+      level: "debug",
       db: process.env.MONGODB_URI,
+      options: {
+        useUnifiedTopology: true,
+      },
       collection: "server_logs",
       format: format.combine(format.timestamp(), format.json()),
     }),
   ],
 });
+
+module.exports = logger;
